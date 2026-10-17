@@ -36,6 +36,9 @@ main{max-width:850px;margin:auto}.hero{text-align:center;padding:20px 10px 26px}
 <section class="card">
 <h2>3. Record your karaoke</h2>
 <p class="note">The recording mixes the song and your microphone into one audio file.</p>
+<label for="syncDelay">Song sync adjustment <span class="value" id="syncValue">0 ms</span></label>
+<input id="syncDelay" type="range" min="0" max="300" step="10" value="0">
+<p class="note">If your voice sounds ahead of the song in the saved recording, increase this slider a little. If your voice sounds behind the song, leave it at 0 and check that you are using headphones; browsers cannot reliably advance a live microphone track.</p>
 <div class="row"><button id="startRecord" class="record">● Start recording</button><button id="stopRecord" class="secondary" disabled>■ Stop recording</button></div>
 <div class="timer" id="timer">00:00</div>
 <div id="recordStatus" class="status">Load a song and enable the microphone before recording.</div>
@@ -50,19 +53,20 @@ main{max-width:850px;margin:auto}.hero{text-align:center;padding:20px 10px 26px}
 </main>
 <script>
 const $=id=>document.getElementById(id);
-const song=$('song'); let songUrl=null, micStream=null, audioCtx=null, micSource=null, micGainNode=null, songSource=null, recordDestination=null, recorder=null, chunks=[], timerId=null, startedAt=0, meterFrame=null, recordingUrl=null;
+const song=$('song'); let songUrl=null, micStream=null, audioCtx=null, micSource=null, micGainNode=null, songSource=null, songRecordDelay=null, recordDestination=null, recorder=null, chunks=[], timerId=null, startedAt=0, meterFrame=null, recordingUrl=null;
 function setStatus(id,msg){$(id).textContent=msg}
 function formatTime(s){s=Math.max(0,Math.floor(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
 $('songFile').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(!file)return;if(songUrl)URL.revokeObjectURL(songUrl);songUrl=URL.createObjectURL(file);song.src=songUrl;$('songTitle').textContent=file.name; song.load();$('result').classList.add('hidden');setStatus('recordStatus','Song loaded. Enable your microphone, then start recording.');});
 $('songVolume').addEventListener('input',()=>{const v=Number($('songVolume').value);song.volume=v/100;$('songValue').textContent=v+'%';});
 song.volume=.5;
+$('syncDelay').addEventListener('input',()=>{const ms=Number($('syncDelay').value);$('syncValue').textContent=ms+' ms';if(songRecordDelay&&audioCtx)songRecordDelay.delayTime.setTargetAtTime(ms/1000,audioCtx.currentTime,.01);});
 $('micGain').addEventListener('input',()=>{const v=Number($('micGain').value);$('micValue').textContent=v+'%';if(micGainNode)micGainNode.gain.value=v/100;});
 async function setupAudio(){
  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
  if(audioCtx.state==='suspended')await audioCtx.resume();
  if(!songSource){songSource=audioCtx.createMediaElementSource(song);songSource.connect(audioCtx.destination);}
  if(!recordDestination)recordDestination=audioCtx.createMediaStreamDestination();
- songSource.connect(recordDestination);
+ if(!songRecordDelay){songRecordDelay=audioCtx.createDelay(1);songRecordDelay.delayTime.value=Number($('syncDelay').value)/1000;songSource.connect(songRecordDelay);songRecordDelay.connect(recordDestination);}
 }
 function startMeter(){
  if(!micSource||!audioCtx)return;
