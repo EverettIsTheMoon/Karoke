@@ -3,36 +3,97 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sing Along Karaoke</title>
+<title>Karaoke Studio</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1020;--text:#f5f7ff;--muted:#aab5d0;--pink:#ff4f9a;--cyan:#54e6d0}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text);background:radial-gradient(ellipse at top,#24315a,var(--bg) 58%);display:grid;place-items:center;padding:24px}
-main{width:min(760px,100%)}header{text-align:center;margin-bottom:24px}.logo{display:inline-grid;place-items:center;width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--pink),#8d63ff);font-size:30px}h1{margin:14px 0 6px;font-size:clamp(2rem,6vw,3rem);letter-spacing:-.04em}header p{color:var(--muted);margin:0}
-.card{background:linear-gradient(160deg,#18223bfa,#10172afa);border:1px solid #ffffff17;border-radius:24px;padding:clamp(18px,4vw,30px);box-shadow:0 24px 70px #0005}label{display:block;font-weight:700;margin-bottom:10px}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}input[type=file]{flex:1;min-width:220px;width:100%;padding:12px;background:#0b1224;border:1px solid #34415f;border-radius:12px;color:var(--muted)}
-button{cursor:pointer;border:0;border-radius:12px;padding:12px 17px;font-weight:800;color:#101528;background:var(--cyan)}button:disabled{opacity:.4;cursor:not-allowed}.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0}.slider{background:#0d1427;border:1px solid #ffffff12;padding:16px;border-radius:16px}.sliderhead{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}.sliderhead span{color:var(--muted);font-size:.9rem}output{color:var(--cyan);font-weight:900}input[type=range]{width:100%;accent-color:var(--cyan)}.mic{background:var(--pink);color:white}.secondary{background:#1d2944;color:var(--text);border:1px solid #ffffff18}.transport{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.status{margin-top:16px;color:var(--muted);font-size:.92rem;min-height:1.4em}.meter{height:8px;background:#080d19;border-radius:99px;overflow:hidden;margin-top:10px}.meter div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink))}.note{margin-top:18px;padding:14px 16px;border-radius:14px;background:#54e6d012;border:1px solid #54e6d033;color:#c8d5ee;font-size:.9rem;line-height:1.5}.note strong{color:white}@media(max-width:560px){.controls{grid-template-columns:1fr}.row button{width:100%}}
+:root{color-scheme:dark;--bg:#0b1020;--card:#151d32;--line:#293653;--text:#f4f7ff;--muted:#aab6d0;--accent:#8b7cff;--pink:#f472b6;--green:#34d399}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1d2850 0,var(--bg) 55%);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text);min-height:100vh;padding:24px}
+main{max-width:850px;margin:auto}.hero{text-align:center;padding:20px 10px 26px}.logo{font-size:44px}.hero h1{margin:4px 0;font-size:clamp(30px,6vw,46px);letter-spacing:-1.5px}.hero p{color:var(--muted);margin:4px 0}
+.card{background:rgba(21,29,50,.94);border:1px solid var(--line);border-radius:20px;padding:22px;margin:14px 0;box-shadow:0 12px 35px #0002}.card h2{font-size:19px;margin:0 0 14px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.file{width:100%;padding:12px;border:1px dashed #596687;border-radius:12px;background:#0e1528;color:var(--muted)}button{border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;background:var(--accent);color:white}button.secondary{background:#283653}button.record{background:#dc4776}button:disabled{opacity:.45;cursor:not-allowed}.status{color:var(--muted);font-size:14px;margin-top:10px;overflow-wrap:anywhere}.songtitle{font-size:18px;font-weight:700;margin:12px 0 4px;overflow-wrap:anywhere}audio{width:100%;margin:8px 0}label{display:block;color:var(--muted);font-size:14px;margin:14px 0 6px}input[type=range]{width:100%;accent-color:var(--accent)}.value{float:right;color:var(--text);font-variant-numeric:tabular-nums}.meter{height:9px;border-radius:99px;background:#0a1020;overflow:hidden;margin-top:8px}.meter>div{height:100%;width:0;background:linear-gradient(90deg,var(--green),#facc15,#fb7185);transition:width .08s}.timer{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}.note{color:var(--muted);font-size:13px}.hidden{display:none!important}.badge{display:inline-block;border-radius:999px;padding:4px 9px;font-size:12px;background:#25314c;color:#cdd6ee;margin-left:8px}
+@media(max-width:560px){body{padding:12px}.card{padding:17px}.row button{min-width:100%}}
 </style>
 </head>
-<body><main>
-<header><div class="logo">🎤</div><h1>Sing Along</h1><p>Your song at 50%. Your voice at 100%. Your karaoke room.</p></header>
+<body>
+<main>
+<header class="hero"><div class="logo">🎤</div><h1>Karaoke Studio</h1><p>Sing along, record your performance, and save it.</p></header>
 <section class="card">
-<label for="songFile">1. Choose a song from your device</label><div class="row"><input id="songFile" type="file" accept="audio/*"><button id="loadBtn">Load song</button></div>
-<div class="controls">
-<div class="slider"><div class="sliderhead"><div><strong>🎵 Song volume</strong><br><span>Backing track</span></div><output id="songValue">50%</output></div><input id="songVolume" type="range" min="0" max="100" value="50" aria-label="Song volume"></div>
-<div class="slider"><div class="sliderhead"><div><strong>🎙️ Vocal volume</strong><br><span>Microphone monitoring</span></div><output id="micValue">100%</output></div><input id="micVolume" type="range" min="0" max="200" value="100" aria-label="Microphone volume"></div>
+<h2>1. Choose your song</h2>
+<input class="file" id="songFile" type="file" accept="audio/*">
+<div class="songtitle" id="songTitle">No song loaded yet</div>
+<audio id="song" controls preload="metadata"></audio>
+<label for="songVolume">Song volume <span class="value" id="songValue">50%</span></label>
+<input id="songVolume" type="range" min="0" max="100" value="50">
+<p class="note">Choose an audio file on your device. It stays on your device and is not uploaded.</p>
+</section>
+<section class="card">
+<h2>2. Set up your microphone</h2>
+<div class="row"><button id="micOn">Enable microphone</button><button class="secondary" id="micOff" disabled>Turn microphone off</button></div>
+<label for="micGain">Microphone recording gain <span class="value" id="micValue">100%</span></label>
+<input id="micGain" type="range" min="0" max="200" value="100">
+<div class="meter"><div id="meterBar"></div></div>
+<div id="micStatus" class="status">Microphone is off.</div>
+<p class="note">Microphone access needs permission. Use headphones to avoid the song leaking from speakers into the mic. Gain at 100% means normal Web Audio gain, not a guarantee of a particular loudness.</p>
+</section>
+<section class="card">
+<h2>3. Record your karaoke</h2>
+<p class="note">The recording mixes the song and your microphone into one audio file.</p>
+<div class="row"><button id="startRecord" class="record">● Start recording</button><button id="stopRecord" class="secondary" disabled>■ Stop recording</button></div>
+<div class="timer" id="timer">00:00</div>
+<div id="recordStatus" class="status">Load a song and enable the microphone before recording.</div>
+<div id="result" class="hidden">
+<h2 style="margin-top:20px">Your recording</h2>
+<audio id="playback" controls></audio>
+<div class="row" style="margin-top:10px"><a id="downloadLink" download="my-karaoke.webm"><button>⬇ Download recording</button></a><button id="discard" class="secondary">Discard recording</button></div>
+<p class="note">If your device saves a .webm file, most modern browsers can play it. You can convert it to MP3 later if needed.</p>
 </div>
-<audio id="song"></audio><div class="transport"><button id="playBtn" disabled>▶ Play song</button><button id="pauseBtn" class="secondary" disabled>⏸ Pause</button><button id="micBtn" class="mic">🎙️ Enable microphone</button><button id="stopMicBtn" class="secondary" disabled>Stop microphone</button></div>
-<div class="status" id="status" role="status" aria-live="polite">Choose an audio file, then load it. Enable your microphone when you're ready to sing.</div><div class="meter"><div id="meterFill"></div></div>
-<div class="note"><strong>How it works:</strong> the song plays at 50% volume by default and your microphone is monitored separately at 100%. Use headphones to reduce echo and feedback. Nothing is uploaded; your audio stays in this browser tab.<br><br><strong>Microphone access:</strong> browsers usually require permission and a secure page (HTTPS or localhost). The vocal slider controls monitoring gain, not guaranteed physical loudness.</div>
-</section></main>
+</section>
+<footer class="note" style="text-align:center;padding:16px">Karaoke Studio · Your files stay in your browser.</footer>
+</main>
 <script>
-(()=>{const $=id=>document.getElementById(id),fileInput=$('songFile'),song=$('song');let url=null,ctx=null,stream=null,source=null,gain=null,analyser=null,raf=null;
-function msg(s){$('status').textContent=s}function updateSong(){let v=+$('songVolume').value;$('songValue').textContent=v+'%';song.volume=v/100}function updateMic(){let v=+$('micVolume').value;$('micValue').textContent=v+'%';if(gain)gain.gain.value=v/100}
-$('loadBtn').onclick=()=>{let f=fileInput.files&&fileInput.files[0];if(!f){msg('Please choose an audio file first.');return}if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);song.src=url;song.load();$('playBtn').disabled=false;$('pauseBtn').disabled=false;updateSong();msg('Loaded: '+f.name+'. Press Play song to start singing.')};
-$('songVolume').oninput=updateSong;$('micVolume').oninput=updateMic;
-$('playBtn').onclick=async()=>{if(!song.src){msg('Choose and load a song first.');return}try{await song.play();msg('Song playing. Sing along!')}catch(e){msg('Could not play this file. Try another audio format supported by your browser.')}};
-$('pauseBtn').onclick=()=>{song.pause();msg('Song paused.')};
-async function startMic(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg('Microphone access needs a modern browser and HTTPS or localhost.');return}try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});let AC=window.AudioContext||window.webkitAudioContext;ctx=new AC();await ctx.resume();source=ctx.createMediaStreamSource(stream);gain=ctx.createGain();analyser=ctx.createAnalyser();analyser.fftSize=512;gain.gain.value=+$('micVolume').value/100;source.connect(gain);gain.connect(ctx.destination);source.connect(analyser);$('micBtn').disabled=true;$('stopMicBtn').disabled=false;msg('Microphone on. Sing! Use headphones to prevent feedback.');let data=new Uint8Array(analyser.frequencyBinCount);function draw(){if(!analyser)return;analyser.getByteTimeDomainData(data);let sum=0;for(let b of data){let n=(b-128)/128;sum+=n*n}$('meterFill').style.width=Math.min(100,Math.sqrt(sum/data.length)*260)+'%';raf=requestAnimationFrame(draw)}draw()}catch(e){stopMic();msg(e&&e.name==='NotAllowedError'?'Microphone permission was denied. Allow microphone access in browser settings.':'Could not start microphone. Check that it is connected and available.')}}
-function stopMic(){if(raf)cancelAnimationFrame(raf);raf=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;if(ctx)ctx.close().catch(()=>{});ctx=null;source=null;gain=null;analyser=null;$('meterFill').style.width='0%';$('micBtn').disabled=false;$('stopMicBtn').disabled=true}
-$('micBtn').onclick=startMic;$('stopMicBtn').onclick=()=>{stopMic();msg('Microphone stopped.')};song.onended=()=>msg('Song finished. Load another track to keep singing.');window.addEventListener('beforeunload',()=>{stopMic();if(url)URL.revokeObjectURL(url)});updateSong();updateMic()})();
-</script></body></html>
+const $=id=>document.getElementById(id);
+const song=$('song'); let songUrl=null, micStream=null, audioCtx=null, micSource=null, micGainNode=null, songSource=null, recordDestination=null, recorder=null, chunks=[], timerId=null, startedAt=0, meterFrame=null, recordingUrl=null;
+function setStatus(id,msg){$(id).textContent=msg}
+function formatTime(s){s=Math.max(0,Math.floor(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+$('songFile').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(!file)return;if(songUrl)URL.revokeObjectURL(songUrl);songUrl=URL.createObjectURL(file);song.src=songUrl;$('songTitle').textContent=file.name; song.load();$('result').classList.add('hidden');setStatus('recordStatus','Song loaded. Enable your microphone, then start recording.');});
+$('songVolume').addEventListener('input',()=>{const v=Number($('songVolume').value);song.volume=v/100;$('songValue').textContent=v+'%';});
+song.volume=.5;
+$('micGain').addEventListener('input',()=>{const v=Number($('micGain').value);$('micValue').textContent=v+'%';if(micGainNode)micGainNode.gain.value=v/100;});
+async function setupAudio(){
+ if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+ if(audioCtx.state==='suspended')await audioCtx.resume();
+ if(!songSource){songSource=audioCtx.createMediaElementSource(song);songSource.connect(audioCtx.destination);}
+ if(!recordDestination)recordDestination=audioCtx.createMediaStreamDestination();
+ songSource.connect(recordDestination);
+}
+function startMeter(){
+ if(!micSource||!audioCtx)return;
+ const analyser=audioCtx.createAnalyser();analyser.fftSize=512;micSource.connect(analyser);const data=new Uint8Array(analyser.fftSize);
+ const tick=()=>{if(!micStream)return;analyser.getByteTimeDomainData(data);let sum=0;for(const n of data){const x=(n-128)/128;sum+=x*x}const rms=Math.sqrt(sum/data.length);$('meterBar').style.width=Math.min(100,Math.round(rms*260))+'%';meterFrame=requestAnimationFrame(tick)};tick();
+}
+$('micOn').addEventListener('click',async()=>{
+ try{
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('This browser does not support microphone access here. Open the GitHub Pages HTTPS site in a regular browser.');
+  await setupAudio();micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});
+  micSource=audioCtx.createMediaStreamSource(micStream);micGainNode=audioCtx.createGain();micGainNode.gain.value=Number($('micGain').value)/100;micSource.connect(micGainNode);micGainNode.connect(recordDestination);
+  $('micOn').disabled=true;$('micOff').disabled=false;setStatus('micStatus','Microphone is ready. Sing into it when recording.');setStatus('recordStatus','Ready to record the song and your voice together.');startMeter();
+ }catch(err){setStatus('micStatus','Microphone error: '+(err.message||err.name||err));}
+});
+$('micOff').addEventListener('click',()=>{if(recorder&&recorder.state==='recording'){setStatus('micStatus','Stop recording before turning off the microphone.');return}if(micStream)micStream.getTracks().forEach(t=>t.stop());micStream=null;micSource=null;micGainNode=null;if(meterFrame)cancelAnimationFrame(meterFrame);$('meterBar').style.width='0';$('micOn').disabled=false;$('micOff').disabled=true;setStatus('micStatus','Microphone is off.');});
+$('startRecord').addEventListener('click',async()=>{
+ try{
+  if(!song.src)throw new Error('Choose a song first.');
+  if(!micStream||!recordDestination)throw new Error('Enable the microphone first.');
+  await setupAudio();if(audioCtx.state==='suspended')await audioCtx.resume();
+  if(!window.MediaRecorder)throw new Error('This browser does not support audio recording. Try Chrome or Edge.');
+  chunks=[];const stream=recordDestination.stream;let options={};if(MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))options.mimeType='audio/webm;codecs=opus';else if(MediaRecorder.isTypeSupported('audio/webm'))options.mimeType='audio/webm';
+  recorder=new MediaRecorder(stream,options);recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  recorder.onerror=e=>setStatus('recordStatus','Recording error: '+(e.error?.message||'unknown error'));
+  recorder.onstop=()=>{clearInterval(timerId);timerId=null;const type=recorder.mimeType||'audio/webm';const blob=new Blob(chunks,{type});if(!blob.size){setStatus('recordStatus','No audio was captured. Check your microphone and try again.');return}if(recordingUrl)URL.revokeObjectURL(recordingUrl);recordingUrl=URL.createObjectURL(blob);$('playback').src=recordingUrl;$('downloadLink').href=recordingUrl;$('downloadLink').download='my-karaoke.'+(type.includes('ogg')?'ogg':'webm');$('result').classList.remove('hidden');setStatus('recordStatus','Recording ready! Play it back or download it.');};
+  recorder.start(250);startedAt=Date.now();$('timer').textContent='00:00';timerId=setInterval(()=>$('timer').textContent=formatTime((Date.now()-startedAt)/1000),250);$('startRecord').disabled=true;$('stopRecord').disabled=false;setStatus('recordStatus','Recording… your voice and the song are being captured.');await song.play();
+ }catch(err){setStatus('recordStatus',err.message||String(err))}
+});
+$('stopRecord').addEventListener('click',()=>{if(recorder&&recorder.state==='recording'){recorder.stop();song.pause();$('startRecord').disabled=false;$('stopRecord').disabled=true}});
+$('discard').addEventListener('click',()=>{if(recordingUrl)URL.revokeObjectURL(recordingUrl);recordingUrl=null;$('playback').removeAttribute('src');$('downloadLink').removeAttribute('href');$('result').classList.add('hidden');setStatus('recordStatus','Recording discarded. You can record again.');});
+window.addEventListener('beforeunload',()=>{if(songUrl)URL.revokeObjectURL(songUrl);if(recordingUrl)URL.revokeObjectURL(recordingUrl)});
+</script>
+</body>
+</html>
