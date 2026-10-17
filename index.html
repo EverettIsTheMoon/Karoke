@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sing Along Karaoke</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--text:#f5f7ff;--muted:#aab5d0;--pink:#ff4f9a;--cyan:#54e6d0}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text);background:radial-gradient(ellipse at top,#24315a,var(--bg) 58%);display:grid;place-items:center;padding:24px}
+main{width:min(760px,100%)}header{text-align:center;margin-bottom:24px}.logo{display:inline-grid;place-items:center;width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--pink),#8d63ff);font-size:30px}h1{margin:14px 0 6px;font-size:clamp(2rem,6vw,3rem);letter-spacing:-.04em}header p{color:var(--muted);margin:0}
+.card{background:linear-gradient(160deg,#18223bfa,#10172afa);border:1px solid #ffffff17;border-radius:24px;padding:clamp(18px,4vw,30px);box-shadow:0 24px 70px #0005}label{display:block;font-weight:700;margin-bottom:10px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}input[type=file]{flex:1;min-width:220px;width:100%;padding:12px;background:#0b1224;border:1px solid #34415f;border-radius:12px;color:var(--muted)}
+button{cursor:pointer;border:0;border-radius:12px;padding:12px 17px;font-weight:800;color:#101528;background:var(--cyan)}button:disabled{opacity:.4;cursor:not-allowed}.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0}.slider{background:#0d1427;border:1px solid #ffffff12;padding:16px;border-radius:16px}.sliderhead{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}.sliderhead span{color:var(--muted);font-size:.9rem}output{color:var(--cyan);font-weight:900}input[type=range]{width:100%;accent-color:var(--cyan)}.mic{background:var(--pink);color:white}.secondary{background:#1d2944;color:var(--text);border:1px solid #ffffff18}.transport{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.status{margin-top:16px;color:var(--muted);font-size:.92rem;min-height:1.4em}.meter{height:8px;background:#080d19;border-radius:99px;overflow:hidden;margin-top:10px}.meter div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink))}.note{margin-top:18px;padding:14px 16px;border-radius:14px;background:#54e6d012;border:1px solid #54e6d033;color:#c8d5ee;font-size:.9rem;line-height:1.5}.note strong{color:white}@media(max-width:560px){.controls{grid-template-columns:1fr}.row button{width:100%}}
+</style>
+</head>
+<body><main>
+<header><div class="logo">🎤</div><h1>Sing Along</h1><p>Your song at 50%. Your voice at 100%. Your karaoke room.</p></header>
+<section class="card">
+<label for="songFile">1. Choose a song from your device</label><div class="row"><input id="songFile" type="file" accept="audio/*"><button id="loadBtn">Load song</button></div>
+<div class="controls">
+<div class="slider"><div class="sliderhead"><div><strong>🎵 Song volume</strong><br><span>Backing track</span></div><output id="songValue">50%</output></div><input id="songVolume" type="range" min="0" max="100" value="50" aria-label="Song volume"></div>
+<div class="slider"><div class="sliderhead"><div><strong>🎙️ Vocal volume</strong><br><span>Microphone monitoring</span></div><output id="micValue">100%</output></div><input id="micVolume" type="range" min="0" max="200" value="100" aria-label="Microphone volume"></div>
+</div>
+<audio id="song"></audio><div class="transport"><button id="playBtn" disabled>▶ Play song</button><button id="pauseBtn" class="secondary" disabled>⏸ Pause</button><button id="micBtn" class="mic">🎙️ Enable microphone</button><button id="stopMicBtn" class="secondary" disabled>Stop microphone</button></div>
+<div class="status" id="status" role="status" aria-live="polite">Choose an audio file, then load it. Enable your microphone when you're ready to sing.</div><div class="meter"><div id="meterFill"></div></div>
+<div class="note"><strong>How it works:</strong> the song plays at 50% volume by default and your microphone is monitored separately at 100%. Use headphones to reduce echo and feedback. Nothing is uploaded; your audio stays in this browser tab.<br><br><strong>Microphone access:</strong> browsers usually require permission and a secure page (HTTPS or localhost). The vocal slider controls monitoring gain, not guaranteed physical loudness.</div>
+</section></main>
+<script>
+(()=>{const $=id=>document.getElementById(id),fileInput=$('songFile'),song=$('song');let url=null,ctx=null,stream=null,source=null,gain=null,analyser=null,raf=null;
+function msg(s){$('status').textContent=s}function updateSong(){let v=+$('songVolume').value;$('songValue').textContent=v+'%';song.volume=v/100}function updateMic(){let v=+$('micVolume').value;$('micValue').textContent=v+'%';if(gain)gain.gain.value=v/100}
+$('loadBtn').onclick=()=>{let f=fileInput.files&&fileInput.files[0];if(!f){msg('Please choose an audio file first.');return}if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);song.src=url;song.load();$('playBtn').disabled=false;$('pauseBtn').disabled=false;updateSong();msg('Loaded: '+f.name+'. Press Play song to start singing.')};
+$('songVolume').oninput=updateSong;$('micVolume').oninput=updateMic;
+$('playBtn').onclick=async()=>{if(!song.src){msg('Choose and load a song first.');return}try{await song.play();msg('Song playing. Sing along!')}catch(e){msg('Could not play this file. Try another audio format supported by your browser.')}};
+$('pauseBtn').onclick=()=>{song.pause();msg('Song paused.')};
+async function startMic(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg('Microphone access needs a modern browser and HTTPS or localhost.');return}try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});let AC=window.AudioContext||window.webkitAudioContext;ctx=new AC();await ctx.resume();source=ctx.createMediaStreamSource(stream);gain=ctx.createGain();analyser=ctx.createAnalyser();analyser.fftSize=512;gain.gain.value=+$('micVolume').value/100;source.connect(gain);gain.connect(ctx.destination);source.connect(analyser);$('micBtn').disabled=true;$('stopMicBtn').disabled=false;msg('Microphone on. Sing! Use headphones to prevent feedback.');let data=new Uint8Array(analyser.frequencyBinCount);function draw(){if(!analyser)return;analyser.getByteTimeDomainData(data);let sum=0;for(let b of data){let n=(b-128)/128;sum+=n*n}$('meterFill').style.width=Math.min(100,Math.sqrt(sum/data.length)*260)+'%';raf=requestAnimationFrame(draw)}draw()}catch(e){stopMic();msg(e&&e.name==='NotAllowedError'?'Microphone permission was denied. Allow microphone access in browser settings.':'Could not start microphone. Check that it is connected and available.')}}
+function stopMic(){if(raf)cancelAnimationFrame(raf);raf=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;if(ctx)ctx.close().catch(()=>{});ctx=null;source=null;gain=null;analyser=null;$('meterFill').style.width='0%';$('micBtn').disabled=false;$('stopMicBtn').disabled=true}
+$('micBtn').onclick=startMic;$('stopMicBtn').onclick=()=>{stopMic();msg('Microphone stopped.')};song.onended=()=>msg('Song finished. Load another track to keep singing.');window.addEventListener('beforeunload',()=>{stopMic();if(url)URL.revokeObjectURL(url)});updateSong();updateMic()})();
+</script></body></html>
